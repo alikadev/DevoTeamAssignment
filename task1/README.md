@@ -11,7 +11,10 @@ This application has been made to run on POSIX environnement (like Linux or MacO
 To compile this program, you need a C compiler (like `gcc` or `clang`) and `make`.
 
 ``` shell
+# Build for user needs
 make all
+# Build with debug informations
+make debug
 ```
 
 # Execute the program

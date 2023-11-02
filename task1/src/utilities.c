@@ -4,7 +4,7 @@
 
 #include "app.h"
 
-app_error app_get_args(
+app_status app_get_args(
 	app_args *pArgs, 
 	int argc, 
 	const char *argv[])
@@ -21,10 +21,10 @@ app_error app_get_args(
 	// Get the argument
 	pArgs->inputFile = argv[1];
 
-	return APP_NO_ERROR;
+	return APP_SUCCESS;
 }
 
-app_error app_read_all(
+app_status app_read_all(
 	char **pBuffer,
 	const char *filename)
 {
@@ -63,5 +63,5 @@ app_error app_read_all(
 	// Close everything
 	fclose(file);
 
-	return APP_NO_ERROR;
+	return APP_SUCCESS;
 }
