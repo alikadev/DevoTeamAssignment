@@ -14,8 +14,8 @@ int main(int argc, char const *argv[])
 {
 	app_status status;
 	app_args args;
-	char *buffer = 0;
-	char *start;
+	char *buffer = NULL;
+	char *start = NULL;
 
 
 	// === Get the arguments === //
