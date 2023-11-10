@@ -37,6 +37,22 @@ class ControllerCLI implements IController
                 }
             }
 
+            if (USING_BING)
+            {
+                // Get count
+                $bingCount = $this->worker->bing_get_result_count($query);
+
+                // Show information
+                print " Bing: $bingCount";
+
+                // Check if it is the best one
+                if ($bingCount > $line_max)
+                {
+                    $line_max = $bingCount;
+                    $line_best = "Bing";
+                }
+            }
+
             // Line end
             
             print " best: $line_best" . PHP_EOL;
