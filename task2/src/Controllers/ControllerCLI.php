@@ -3,6 +3,7 @@
 require_once "Controllers/IController.php";
 require_once "Workers/Worker.php";
 require_once "Exceptions/RequestException.php";
+require_once "config.php";
 
 class ControllerCLI implements IController
 {
@@ -10,6 +11,39 @@ class ControllerCLI implements IController
 
     public function __construct()
     {
+    }
+
+    private function process_query(string $query) : void
+    {
+        $line_max = 0;
+        $line_best = "NOBODY";
+        try {
+            // Line start
+            print '"' . $query . '" ';
+
+            if (USING_GOOGLE)
+            {
+                // Get count
+                $googleCount = $this->worker->google_get_result_count($query);
+
+                // Show information
+                print "Google: $googleCount";
+
+                // Check if it is the best one
+                if ($googleCount > $line_max)
+                {
+                    $line_max = $googleCount;
+                    $line_best = "Google";
+                }
+            }
+
+            // Line end
+            
+            print " best: $line_best" . PHP_EOL;
+                
+        } catch (RequestException $ex) {
+            print "ERROR: " . $ex->getMessage() . PHP_EOL;
+        }
     }
 
     /**
@@ -22,14 +56,9 @@ class ControllerCLI implements IController
         $this->worker->start();
 
         array_shift($_SERVER["argv"]);
-        foreach ($_SERVER["argv"] as $search)
+        foreach ($_SERVER["argv"] as $query)
         {
-            try {
-                $googleCount = $this->worker->google_get_result_count($search);
-                print "For $search Google: $googleCount" . PHP_EOL;
-            } catch (RequestException $ex) {
-                print "ERROR: " . $ex->getMessage() . PHP_EOL;
-            }
+            $this->process_query($query);
         }
     }
 
