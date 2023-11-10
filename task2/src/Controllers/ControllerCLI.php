@@ -84,7 +84,12 @@ class ControllerCLI implements IController
         $this->worker->start();
         $globalBest = "";
 
-        array_shift($_SERVER["argv"]);
+        $command = array_shift($_SERVER["argv"]);
+        if (count($_SERVER["argv"]) == 0)
+        {
+            print "Usage: $command <args>" . PHP_EOL;
+            return;
+        }
         foreach ($_SERVER["argv"] as $query)
         {
             $this->process_query($query);
