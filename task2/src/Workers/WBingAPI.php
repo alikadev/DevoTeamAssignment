@@ -6,6 +6,12 @@ class WBingAPI implements IWAPIRequester
 {
     const BING_API_URL = "https://api.bing.microsoft.com/v7.0/search";
 
+    /**
+     * Get the Bing search engine estimated result count.
+     * 
+     * @param  string $query The query to process
+     * @return int           The estimated result count.
+     */
     public function get_result_count(string $query) : int
     {
         // Prepare the context
@@ -21,7 +27,7 @@ class WBingAPI implements IWAPIRequester
         // Do the GET request to the Google API
         $json = file_get_contents(
             $this::BING_API_URL . 
-            "?q=" . $this->parse_query($query),
+            "?q=" . urlencode($query),
             false,
             $context
          );
@@ -43,10 +49,6 @@ class WBingAPI implements IWAPIRequester
          if (!isset($req["totalEstimatedMatches"])) return 0;
  
          return intval($req["totalEstimatedMatches"]);
-    }
-
-    private function parse_query(string $query) : string 
-    {
-        return str_replace(" ", "%20", $query);
+         
     }
 }

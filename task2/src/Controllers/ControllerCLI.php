@@ -1,39 +1,50 @@
 <?php
 
-require_once "Controllers/IController.php";
+require_once "IController.php";
 require_once "Workers/Worker.php";
 require_once "Exceptions/RequestException.php";
 require_once "config.php";
 
 class ControllerCLI implements IController
 {
+    private const GOOGLE_ID = "Google";
+    private const BING_ID = "Bing";
     private Worker $worker;
+    private array $best; // name => [query, result]
 
     public function __construct()
     {
+        $this->best = [];
     }
 
-    private function process_query(string $query) : void
+    /**
+     * Process a single query on each supported search engine.
+     * 
+     * @param  string $query The query to process
+     */
+    private function process_query(string $query)
     {
-        $line_max = 0;
-        $line_best = "NOBODY";
         try {
             // Line start
-            print '"' . $query . '" ';
+            print '"' . $query . '"';
 
+            // Process engines
             if (USING_GOOGLE)
             {
                 // Get count
                 $googleCount = $this->worker->google_get_result_count($query);
 
                 // Show information
-                print "Google: $googleCount";
+                print " Google: $googleCount";
 
                 // Check if it is the best one
-                if ($googleCount > $line_max)
+                if (!isset($this->best[$this::GOOGLE_ID]) 
+                    || $googleCount > $this->best[$this::GOOGLE_ID])
                 {
-                    $line_max = $googleCount;
-                    $line_best = "Google";
+                    $this->best[$this::GOOGLE_ID] = [
+                        "query" => $query,
+                        "result" => $googleCount
+                    ];
                 }
             }
 
@@ -46,16 +57,17 @@ class ControllerCLI implements IController
                 print " Bing: $bingCount";
 
                 // Check if it is the best one
-                if ($bingCount > $line_max)
+                if (!isset($this->best[$this::BING_ID]) 
+                    || $bingCount > $this->best[$this::BING_ID])
                 {
-                    $line_max = $bingCount;
-                    $line_best = "Bing";
+                    $this->best[$this::BING_ID] = [
+                        "query" => $query,
+                        "result" => $bingCount
+                    ];
                 }
             }
 
-            // Line end
-            
-            print " best: $line_best" . PHP_EOL;
+            print PHP_EOL;
                 
         } catch (RequestException $ex) {
             print "ERROR: " . $ex->getMessage() . PHP_EOL;
@@ -70,12 +82,20 @@ class ControllerCLI implements IController
     public function start() : void
     {
         $this->worker->start();
+        $globalBest = "";
 
         array_shift($_SERVER["argv"]);
         foreach ($_SERVER["argv"] as $query)
         {
             $this->process_query($query);
         }
+
+        foreach ($this->best as $best => $info)
+        {
+            print "$best winner: " . $info["query"] . PHP_EOL;
+        }
+
+        print "Total winner: ". $this->worker->get_best($this->best) . PHP_EOL;
     }
 
     public function setWorker(Worker $worker) : void

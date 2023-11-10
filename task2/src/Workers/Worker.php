@@ -23,6 +23,28 @@ class Worker
     }
 
     /**
+     * Get the best search engine API in the "best" array.
+     * The array for at is (engine => [result, query])
+     * 
+     * @param  array  $arr The "best" array
+     * @return string      The best of the "best" array
+     */
+    public function get_best(array $arr) : string
+    {
+        $best = "";
+        $bestResult = -1;
+        foreach ($arr as $engine => $info)
+        {
+            if ($bestResult < $info["result"])
+            {
+                $best = $engine;
+                $bestResult = $info["result"];
+            }
+        }
+        return $best;
+    }
+
+    /**
      * Use the Bing's Search API to get the result count for a query.
      * 
      * @param string $query The query.

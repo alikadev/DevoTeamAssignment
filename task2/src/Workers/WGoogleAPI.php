@@ -6,6 +6,12 @@ class WGoogleAPI implements IWAPIRequester
 {
     const GOOGLE_API_URL = "https://www.googleapis.com/customsearch/v1";
 
+    /**
+     * Get the Google search engine estimated result count.
+     * 
+     * @param  string $query The query to process
+     * @return int           The estimated result count.
+     */
     public function get_result_count(string $query) : int
     {
         // Do the GET request to the Google API
@@ -13,7 +19,7 @@ class WGoogleAPI implements IWAPIRequester
             $this::GOOGLE_API_URL . 
             "?key=" . GOOGLE_API_KEY . 
             "&cx=" . GOOGLE_CX . 
-            "&q=" . $this->parse_query($query)
+            "&q=" . urlencode($query)
          );
  
          if ($json == false)
@@ -33,10 +39,5 @@ class WGoogleAPI implements IWAPIRequester
          if (!isset($req["totalResults"])) return 0;
  
          return intval($req["totalResults"]);
-    }
-
-    private function parse_query(string $query) : string 
-    {
-        return str_replace(" ", "%20", $query);
     }
 }
